@@ -1,0 +1,21 @@
+{
+  "name": "pupulation",
+  "version": "0.1.0",
+  "main": "index.js",
+  "license": "MIT",
+  "description": "Genetic algorithm",
+  "author": "Denes Pal <dsdenes@gmail.com>",
+  "engines": {
+    "node": ">=8.9.3"
+  },
+  "scripts": {
+    "release-patch": "npm version patch && npm publish",
+    "release-minor": "npm version minor && npm publish",
+    "release-major": "npm version major && npm publish"
+  },
+  "dependencies": {
+    "config": "^1.28.1",
+    "debug": "^3.1.0",
+    "lodash": "^4.17.4"
+  }
+}
