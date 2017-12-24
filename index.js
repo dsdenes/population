@@ -20,6 +20,7 @@ module.exports = function genetic(options = {}) {
     crossover: () => {},
     getFitness: () => {},
     memberHash: () => {},
+    eliteUniqHash: () => {},
     getRandomMember: () => {},
   });
 
@@ -163,11 +164,16 @@ module.exports = function genetic(options = {}) {
   }
 
   function getElite(population) {
-    return _.slice(population, 0, eliteCount);
+    const eliteUniqPopulation = getUniqElite(population);
+    return _.slice(eliteUniqPopulation, 0, eliteCount);
   }
 
   function makePopulationUniq(population) {
     return _.uniqBy(population, member => options.memberHash(member))
+  }
+
+  function getUniqElite(population) {
+    return _.uniqBy(population, options.eliteUniqHash)
   }
 
 };
