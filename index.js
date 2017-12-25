@@ -13,7 +13,7 @@ module.exports = function genetic(options = {}) {
     mutator: () => {},
     crossover: () => {},
     getFitness: () => {},
-    memberHash: () => {},
+    hash: () => {},
     eliteUniqHash: () => {},
     getRandomMember: () => {},
   });
@@ -171,7 +171,7 @@ module.exports = function genetic(options = {}) {
   }
 
   function makePopulationUniq(population) {
-    return _.uniqBy(population, member => options.memberHash(member))
+    return _.uniqBy(population, member => options.hash(member))
   }
 
   function getUniqElite(population) {
