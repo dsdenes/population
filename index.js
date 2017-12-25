@@ -9,6 +9,9 @@ module.exports = function genetic(options = {}) {
     eliteRatio: 0.1,
     newBloodRatio: 0.05,
     mutationProbability: 0.5,
+    targetFitness: 1,
+    targetFitDidntChange: 50000,
+    targetGeneration: 50000,
     population: [],
     mutator: () => {},
     crossover: () => {},
@@ -74,13 +77,13 @@ module.exports = function genetic(options = {}) {
   }
 
   function stopCondition(population) {
-    if (_.map(population, 'fitness')[0] >= 10) {
+    if (_.map(population, 'fitness')[0] >= options.targetFitness) {
       log(`Awesome fitness found.`);
       return true;
-    } else if (fitNotChanged >= 10000) {
+    } else if (fitNotChanged >= options.targetFitDidntChange) {
       log(`Fit didn't change for 10 generation.`);
       return true;
-    } else if (generation++ >= 50000) {
+    } else if (generation++ >= options.targetGeneration) {
       log(`Reached 5000 generation.`);
       return true;
     }
