@@ -1,13 +1,7 @@
 const _ = require('lodash');
-const util = require('util');
 const Debug = require('debug');
-const log = Debug('ga');
-const debug = Debug('ga:debug');
-
+const log = Debug('population');
 log.log = console.log.bind(console);
-debug.log = console.log.bind(console);
-
-const debugFull = msg => console.log(util.inspect(msg, { showHidden: false, depth: null }));
 
 module.exports = function genetic(options = {}) {
 
@@ -48,9 +42,9 @@ module.exports = function genetic(options = {}) {
     population = orderByFitness(population);
     population = attachRank(population);
 
-    // population.map(member => {
-    //   debug(`${_.round(member.fitness, 6)} ${member.rank} ${JSON.stringify(member.expression.serialize())}`);
-    // });
+    _.slice(population, 0, 10).map(member => {
+      Debug('population:evaluated')(`${_.round(member.fitness, 6)} ${member.rank} ${JSON.stringify(member.expression.serialize())}`);
+    });
 
     const bestFitness = _.map(population, 'fitness')[0];
     if (lastBestFitness !== bestFitness || !recursive) {
@@ -97,6 +91,11 @@ module.exports = function genetic(options = {}) {
     const offspringPopulation = generateAllOffspring(parents);
     const mutatedPopulation = mutatePopulation(offspringPopulation);
     const newPopulation = mixPopulations(population, mutatedPopulation);
+
+    _.slice(newPopulation, 0, 10).map(member => {
+      Debug('population:new')(`${_.round(member.fitness, 6)} ${member.rank} ${JSON.stringify(member.expression.serialize())}`);
+    });
+
     const uniqNewPopulation = makePopulationUniq(newPopulation);
     const newBloodPopulation = _.concat(uniqNewPopulation,
       _.times(population.length - uniqNewPopulation.length, options.getRandomMember));
@@ -160,6 +159,9 @@ module.exports = function genetic(options = {}) {
 
   function mixPopulations(oldPopulation, newPopulation) {
     const elite = getElite(oldPopulation);
+    elite.map(member => {
+      Debug('population:elite')(`${_.round(member.fitness, 6)} ${member.rank} ${JSON.stringify(member.expression.serialize())}`);
+    });
     return _.concat(elite, newPopulation);
   }
 
