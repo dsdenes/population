@@ -116,8 +116,7 @@ module.exports = function genetic(options = {}) {
   function attachRank(population) {
     let maxRank = population.length;
     return population.map(member => {
-      member.rank = _.floor(Math.log(maxRank)) * maxRank;
-      maxRank--;
+      member.rank = maxRank--;
       return member;
     });
   }
