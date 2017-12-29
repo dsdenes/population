@@ -26,6 +26,7 @@ module.exports = function genetic(options = {}) {
 
   let generation = 0;
 
+  const originalPopulationLength = options.population.length;
   const eliteRatio = options.eliteRatio;
   const eliteCount = _.floor(options.population.length * eliteRatio);
   const newBloodRatio = options.newBloodRatio;
@@ -107,7 +108,7 @@ module.exports = function genetic(options = {}) {
 
     const uniqNewPopulation = makePopulationUniq(newPopulation);
     const newBloodPopulation = _.concat(uniqNewPopulation,
-      _.times(population.length - uniqNewPopulation.length, options.getRandomMember));
+      _.times(originalPopulationLength - uniqNewPopulation.length, options.getRandomMember));
     return newBloodPopulation;
   }
 
