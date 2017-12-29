@@ -20,6 +20,7 @@ module.exports = function genetic(options = {}) {
     hash: () => {},
     eliteUniqHash: () => {},
     getRandomMember: () => {},
+    onBestFitness: () => {}
   });
 
   let generation = 0;
@@ -60,7 +61,7 @@ module.exports = function genetic(options = {}) {
     lastBestFitness = bestFitness;
 
     if (bestFitnessEver === null || bestFitnessEver < bestFitness) {
-      _.map(population, 'expression')[0].print();
+      options.onBestFitness(population);
       bestFitnessEver = bestFitness;
     }
 
