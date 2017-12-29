@@ -54,9 +54,10 @@ module.exports = function genetic(options = {}) {
     population = attachRank(population);
 
     _.slice(population, 0, 10).map(member => {
-      Debug('population:evaluated')(`${_.round(member.fitness, 6)} ${member.rank} ${JSON.stringify(member.expression.serialize())}`);
+      Debug('population:evaluated')(`${_.round(member.fitness, 6)} ${member.rank} ${member.serialized}`);
     });
 
+    population = options.orderByFitness(population);
     const bestFitness = _.map(population, 'fitness')[0];
     if (lastBestFitness !== bestFitness || !recursive) {
       fitNotChanged = 0;
@@ -74,12 +75,9 @@ module.exports = function genetic(options = {}) {
 
     if (stopCondition(population)) {
       log('STOP CONDITION OCCURRED');
-      _.map(population, 'expression').map(pop => pop.print());
       return population;
     } else {
       const newPopulation = evolve(population);
-      // _.map(newPopulation, 'expression').map(ex => ex.print());
-      // console.log(newPopulation);
       return run(newPopulation, true);
     }
   }
@@ -104,7 +102,7 @@ module.exports = function genetic(options = {}) {
     const newPopulation = mixPopulations(population, mutatedPopulation);
 
     _.slice(newPopulation, 0, 10).map(member => {
-      Debug('population:new')(`${_.round(member.fitness, 6)} ${member.rank} ${JSON.stringify(member.expression.serialize())}`);
+      Debug('population:new')(`${_.round(member.fitness, 6)} ${member.rank} ${member.serialized}`);
     });
 
     const uniqNewPopulation = makePopulationUniq(newPopulation);
@@ -170,7 +168,7 @@ module.exports = function genetic(options = {}) {
   function mixPopulations(oldPopulation, newPopulation) {
     const elite = getElite(oldPopulation);
     elite.map(member => {
-      Debug('population:elite')(`${_.round(member.fitness, 6)} ${member.rank} ${JSON.stringify(member.expression.serialize())}`);
+      Debug('population:elite')(`${_.round(member.fitness, 6)} ${member.rank} ${member.serialized}`);
     });
     return _.concat(elite, newPopulation);
   }
