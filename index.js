@@ -16,6 +16,7 @@ module.exports = function genetic(options = {}) {
     mutator: () => {},
     crossover: () => {},
     getFitness: () => {},
+    orderByFitness,
     hash: () => {},
     eliteUniqHash: () => {},
     getRandomMember: () => {},
@@ -42,7 +43,8 @@ module.exports = function genetic(options = {}) {
 
   async function run(population = options.population, recursive = false) {
     population = await attachFitness(population);
-    population = orderByFitness(population);
+    population = options.orderByFitness(population);
+
     population = attachRank(population);
 
     _.slice(population, 0, 10).map(member => {
@@ -113,7 +115,7 @@ module.exports = function genetic(options = {}) {
   }
 
   function orderByFitness(population) {
-    return _.orderBy(population, 'fitness', 'desc');
+    return _.orderBy(population, ['fitness'], 'desc');
   }
 
   function attachRank(population) {
