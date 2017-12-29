@@ -17,6 +17,7 @@ module.exports = function genetic(options = {}) {
     crossover: () => {},
     getFitness: () => {},
     orderByFitness,
+    eliminateMembers: population => population,
     hash: () => {},
     eliteUniqHash: () => {},
     getRandomMember: () => {},
@@ -45,6 +46,10 @@ module.exports = function genetic(options = {}) {
   async function run(population = options.population, recursive = false) {
     population = await attachFitness(population);
     population = options.orderByFitness(population);
+
+    log(`Before elimination: ${population.length}`);
+    population = options.eliminateMembers(population);
+    log(`After elimination: ${population.length}`);
 
     population = attachRank(population);
 
