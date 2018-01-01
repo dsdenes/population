@@ -49,7 +49,7 @@ module.exports = function genetic(options = {}) {
     population = options.orderByFitness(population);
 
     log(`Before elimination: ${population.length}`);
-    population = options.eliminateMembers(population);
+    population = await options.eliminateMembers(population);
     log(`After elimination: ${population.length}`);
 
     population = attachRank(population);
