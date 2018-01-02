@@ -85,13 +85,13 @@ module.exports = function genetic(options = {}) {
 
   function stopCondition(population) {
     if (_.map(population, 'fitness')[0] >= options.targetFitness) {
-      log(`Awesome fitness found.`);
+      log(`Awesome fitness found, better than ${options.targetFitness}`);
       return true;
     } else if (fitNotChanged >= options.targetFitDidntChange) {
-      log(`Fit didn't change for 10 generation.`);
+      log(`Fit didn't change for ${options.targetFitDidntChange} generation.`);
       return true;
     } else if (generation++ >= options.targetGeneration) {
-      log(`Reached 5000 generation.`);
+      log(`Reached ${options.targetGeneration} generation.`);
       return true;
     }
   }
