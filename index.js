@@ -21,7 +21,8 @@ module.exports = function genetic(options = {}) {
     hash: () => {},
     eliteUniqHash: () => {},
     getRandomMember: () => {},
-    onBestFitness: () => {}
+    onBestFitness: () => {},
+    onGenerationBestFitness: () => {}
   });
 
   let generation = 0;
@@ -54,12 +55,15 @@ module.exports = function genetic(options = {}) {
 
     population = attachRank(population);
 
-    _.slice(population, 0, 10).map(member => {
+    population.map(member => {
       Debug('population:evaluated')(`${_.round(member.fitness, 6)} ${member.rank} ${member.serialized}`);
     });
 
     population = options.orderByFitness(population);
     const bestFitness = _.map(population, 'fitness')[0];
+
+    options.onGenerationBestFitness(bestFitness);
+
     if (lastBestFitness !== bestFitness || !recursive) {
       fitNotChanged = 0;
     } else {
@@ -68,7 +72,7 @@ module.exports = function genetic(options = {}) {
     lastBestFitness = bestFitness;
 
     if (bestFitnessEver === null || bestFitnessEver < bestFitness) {
-      options.onBestFitness(population);
+      options.onBestFitness(bestFitness, population);
       bestFitnessEver = bestFitness;
     }
 
@@ -102,8 +106,8 @@ module.exports = function genetic(options = {}) {
     const mutatedPopulation = mutatePopulation(offspringPopulation);
     const newPopulation = mixPopulations(population, mutatedPopulation);
 
-    _.slice(newPopulation, 0, 10).map(member => {
-      Debug('population:new')(`${_.round(member.fitness, 6)} ${member.rank} ${member.serialized}`);
+    newPopulation.map(member => {
+      Debug('population:new')(`${member.serialized}`);
     });
 
     const uniqNewPopulation = makePopulationUniq(newPopulation);
@@ -180,7 +184,7 @@ module.exports = function genetic(options = {}) {
   }
 
   function makePopulationUniq(population) {
-    return _.uniqBy(population, member => options.hash(member))
+    return _.uniqBy(population, options.hash)
   }
 
   function getUniqElite(population) {
