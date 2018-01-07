@@ -17,7 +17,8 @@ module.exports = function genetic(options = {}) {
     crossover: () => {},
     getFitness: () => {},
     orderByFitness,
-    eliminateMembers: population => population,
+    beforeFitnessCalculated: population => population,
+    afterFitnessCalculated: population => population,
     hash: () => {},
     eliteUniqHash: () => {},
     getRandomMember: () => {},
@@ -46,11 +47,12 @@ module.exports = function genetic(options = {}) {
   });
 
   async function run(population = options.population, recursive = false) {
+    population = await options.beforeFitnessCalculated(population);
     population = await attachFitness(population);
+    population = await options.afterFitnessCalculated(population);
     population = options.orderByFitness(population);
 
     log(`Before elimination: ${population.length}`);
-    population = await options.eliminateMembers(population);
     log(`After elimination: ${population.length}`);
 
     population = attachRank(population);
@@ -59,7 +61,6 @@ module.exports = function genetic(options = {}) {
       Debug('population:evaluated')(`${_.round(member.fitness, 6)} ${member.rank} ${member.serialized}`);
     });
 
-    population = options.orderByFitness(population);
     const bestFitness = _.map(population, 'fitness')[0];
 
     options.onGenerationBestFitness(bestFitness);
