@@ -1,7 +1,14 @@
 const _ = require('lodash');
 const Debug = require('debug');
-const log = Debug('population');
-log.log = console.log.bind(console);
+const debugs = {};
+
+function debug(message, base = 'default') {
+  if (!(base in debugs)) {
+    debugs[base] = base === 'default' ? Debug(`population`) : Debug(`population:${base}`);
+    debugs[base].log = console.log.bind(console);
+  }
+  debugs[base](message);
+}
 
 module.exports = function genetic(options = {}) {
 
@@ -38,27 +45,27 @@ module.exports = function genetic(options = {}) {
   let bestFitnessEver = null;
   let fitNotChanged = 0;
 
-  log(`Population size: ${options.population.length}`);
-  log(`Elite size: ${eliteCount}`);
-  log(`Offspring size: ${offspringCount}`);
+  debug(`Population size: ${options.population.length}`, 'debug');
+  debug(`Elite size: ${eliteCount}`, 'debug');
+  debug(`Offspring size: ${offspringCount}`, 'debug');
+  debug(`New blood size: ${newBloodCount}`, 'debug');
 
   return Object.freeze({
     run
   });
 
   async function run(population = options.population, recursive = false) {
+    debug(`Population count: ${population.length}`, 'debug');
     population = await options.beforeFitnessCalculated(population);
     population = await attachFitness(population);
     population = await options.afterFitnessCalculated(population);
+    debug(`After afterFitnessCalculated called: ${population.length}`, 'debug');
+
     population = options.orderByFitness(population);
-
-    log(`Before elimination: ${population.length}`);
-    log(`After elimination: ${population.length}`);
-
     population = attachRank(population);
 
     population.map(member => {
-      Debug('population:evaluated')(`${_.round(member.fitness, 6)} ${member.rank} ${member.serialized}`);
+      debug(`${_.round(member.fitness, 6)} ${member.rank} ${member.serialized}`, 'silly');
     });
 
     const bestFitness = _.map(population, 'fitness')[0];
@@ -77,10 +84,9 @@ module.exports = function genetic(options = {}) {
       bestFitnessEver = bestFitness;
     }
 
-    log(bestFitness);
+    debug(`Generation: ${generation + 1}, Best fitness: ${bestFitness}, Fit not changed: ${fitNotChanged}`);
 
     if (stopCondition(population)) {
-      log('STOP CONDITION OCCURRED');
       return population;
     } else {
       const newPopulation = evolve(population);
@@ -90,13 +96,13 @@ module.exports = function genetic(options = {}) {
 
   function stopCondition(population) {
     if (_.map(population, 'fitness')[0] >= options.targetFitness) {
-      log(`Awesome fitness found, better than ${options.targetFitness}`);
+      debug(`Awesome fitness found, better than ${options.targetFitness}`);
       return true;
     } else if (fitNotChanged >= options.targetFitDidntChange) {
-      log(`Fit didn't change for ${options.targetFitDidntChange} generation.`);
+      debug(`Fit didn't change for ${options.targetFitDidntChange} generation.`);
       return true;
     } else if (generation++ >= options.targetGeneration) {
-      log(`Reached ${options.targetGeneration} generation.`);
+      debug(`Reached ${options.targetGeneration} generation.`);
       return true;
     }
   }
@@ -108,7 +114,7 @@ module.exports = function genetic(options = {}) {
     const newPopulation = mixPopulations(population, mutatedPopulation);
 
     newPopulation.map(member => {
-      Debug('population:new')(`${member.serialized}`);
+      debug(`${member.serialized}`, 'silly');
     });
 
     const uniqNewPopulation = makePopulationUniq(newPopulation);
@@ -174,7 +180,7 @@ module.exports = function genetic(options = {}) {
   function mixPopulations(oldPopulation, newPopulation) {
     const elite = getElite(oldPopulation);
     elite.map(member => {
-      Debug('population:elite')(`${_.round(member.fitness, 6)} ${member.rank} ${member.serialized}`);
+      debug(`${_.round(member.fitness, 6)} ${member.rank} ${member.serialized}`, 'debug');
     });
     return _.concat(elite, newPopulation);
   }
