@@ -101,7 +101,7 @@ module.exports = function genetic(options = {}) {
     } else if (fitNotChanged >= options.targetFitDidntChange) {
       debug(`Fit didn't change for ${options.targetFitDidntChange} generation.`);
       return true;
-    } else if (generation++ >= options.targetGeneration) {
+    } else if (++generation >= options.targetGeneration) {
       debug(`Reached ${options.targetGeneration} generation.`);
       return true;
     }
