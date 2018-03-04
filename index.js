@@ -23,6 +23,7 @@ module.exports = function genetic(options = {}) {
     mutator: () => {},
     crossover: () => {},
     getFitness: () => {},
+    attachAllFitness: null,
     orderByFitness,
     beforeFitnessCalculated: population => population,
     afterFitnessCalculated: population => population,
@@ -124,10 +125,14 @@ module.exports = function genetic(options = {}) {
   }
 
   function attachFitness(population) {
-    return Promise.all(population.map(async (member) => {
-      member.fitness = await options.getFitness(member);
-      return member;
-    }));
+    if (_.isFunction(options.attachAllFitness)) {
+      return options.attachAllFitness(population);
+    } else {
+      return Promise.all(population.map(async (member) => {
+        member.fitness = await options.getFitness(member);
+        return member;
+      }));
+    }
   }
 
   function orderByFitness(population) {
