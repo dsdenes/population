@@ -16,7 +16,7 @@ module.exports = function genetic(options = {}) {
     eliteRatio: 0.1,
     newBloodRatio: 0.05,
     mutationProbability: 0.5,
-    targetFitness: 1,
+    targetFitness: null,
     targetFitDidntChange: 50000,
     targetGeneration: 50000,
     population: [],
@@ -96,7 +96,7 @@ module.exports = function genetic(options = {}) {
   }
 
   function stopCondition(population) {
-    if (_.map(population, 'fitness')[0] >= options.targetFitness) {
+    if (options.targetFitness !== null && _.map(population, 'fitness')[0] >= options.targetFitness) {
       debug(`Awesome fitness found, better than ${options.targetFitness}`);
       return true;
     } else if (fitNotChanged >= options.targetFitDidntChange) {
