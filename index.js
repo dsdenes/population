@@ -81,7 +81,7 @@ module.exports = function genetic(options = {}) {
     lastBestFitness = bestFitness;
 
     if (bestFitnessEver === null || bestFitnessEver < bestFitness) {
-      options.onBestFitness(bestFitness, population);
+      options.onBestFitness(population[0]);
       bestFitnessEver = bestFitness;
     }
 
